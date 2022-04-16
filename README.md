@@ -1,3 +1,15 @@
+# My changes
+
+I added display item "#{battery_smart}".
+
+power state | display
+-|-
+Power >= 98%<br>Plugged in | icon_status_charged
+Otherwise | Icon_status, percentage and remain with color_charge bg
+
+
+
+
 # Tmux battery status
 
 Enables displaying battery percentage and status icon in tmux status-right.
