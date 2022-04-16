@@ -2,7 +2,8 @@
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-source "$CURRENT_DIR/scripts/helpers.sh"
+ # shellcheck disable=SC1091
+ source "$CURRENT_DIR/scripts/helpers.sh"
 
 battery_interpolation=(
 	"\#{battery_color_bg}"
@@ -17,6 +18,7 @@ battery_interpolation=(
 	"\#{battery_icon_status}"
 	"\#{battery_percentage}"
 	"\#{battery_remain}"
+	"\#{battery_smart}"
 )
 
 battery_commands=(
@@ -32,6 +34,7 @@ battery_commands=(
 	"#($CURRENT_DIR/scripts/battery_icon_status.sh)"
 	"#($CURRENT_DIR/scripts/battery_percentage.sh)"
 	"#($CURRENT_DIR/scripts/battery_remain.sh)"
+	"#($CURRENT_DIR/scripts/battery_smart.sh)"
 )
 
 set_tmux_option() {
@@ -50,8 +53,10 @@ do_interpolation() {
 
 update_tmux_option() {
 	local option="$1"
-	local option_value="$(get_tmux_option "$option")"
-	local new_option_value="$(do_interpolation "$option_value")"
+	local option_value
+	local new_option_value
+	option_value="$(get_tmux_option "$option")"
+	new_option_value="$(do_interpolation "$option_value")"
 	set_tmux_option "$option" "$new_option_value"
 }
 

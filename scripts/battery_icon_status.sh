@@ -2,6 +2,7 @@
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
 
 # script global variables
@@ -19,12 +20,18 @@ icon_status_discharging_default='🔋'
 icon_status_attached_default='⚠️'
 icon_status_unknown_default='?'
 
+
+is_osx() {
+	[ "$(uname)" == "Darwin" ]
+}
+
+
 # determine which charged_default variable to use
 get_icon_status_charged_default() {
 	if is_osx; then
-		printf "$icon_status_charged_default_osx"
+		printf "%s" "$icon_status_charged_default_osx"
 	else
-		printf "$icon_status_charged_default"
+		printf "%s" "$icon_status_charged_default"
 	fi
 }
 
@@ -40,22 +47,23 @@ get_icon_status_settings() {
 print_icon_status() {
 	local status=$1
 	if [[ $status =~ (charged) || $status =~ (full) ]]; then
-		printf "$icon_status_charged"
+		printf "%s" "$icon_status_charged"
 	elif [[ $status =~ (^charging) ]]; then
-		printf "$icon_status_charging"
+		printf "%s" "$icon_status_charging"
 	elif [[ $status =~ (^discharging) ]]; then
-		printf "$icon_status_discharging"
+		printf "%s" "$icon_status_discharging"
 	elif [[ $status =~ (attached) ]]; then
-		printf "$icon_status_attached"
+		printf "%s" "$icon_status_attached"
 	else
-		printf "$icon_status_unknown"
+		printf "%s" "$icon_status_unknown"
 	fi
 }
 
 main() {
-	get_icon_status_settings
 	local status=${1:-$(battery_status)}
+	get_icon_status_settings
 	print_icon_status "$status"
 }
 
-main
+main "$@"
+

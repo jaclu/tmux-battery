@@ -2,6 +2,7 @@
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+ # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
 
 # script global variables
@@ -48,19 +49,25 @@ print_color_status() {
 	if [ "$plane_primary" == "bg" ]; then
 		plane_secondary="fg"
 	else
+		plane_primary="fg"
 		plane_secondary="bg"
 	fi
 	local status="$2"
 	if [[ $status =~ (charged) || $status =~ (full) ]]; then
-		printf "#[$plane_primary=$color_status_primary_charged${color_status_secondary_charged:+",$plane_secondary=$color_status_secondary_charged"}]"
+		printf "#[%s=%s%s]" "$plane_primary" "$color_status_primary_charged" \
+		${color_status_secondary_charged:+",$plane_secondary=$color_status_secondary_charged"}
 	elif [[ $status =~ (^charging) ]]; then
-		printf "#[$plane_primary=$color_status_primary_charging${color_status_secondary_charging:+",$plane_secondary=$color_status_secondary_charging"}]"
+		printf "#[%s=%s%s]" "$plane_primary" "$color_status_primary_charging" \
+		${color_status_secondary_charging:+",$plane_secondary=$color_status_secondary_charging"}
 	elif [[ $status =~ (^discharging) ]]; then
-		printf "#[$plane_primary=$color_status_primary_discharging${color_status_secondary_discharging:+",$plane_secondary=$color_status_secondary_discharging"}]"
+		printf "#[%s=%s%s]" "$plane_primary" "$color_status_primary_discharging" \
+		${color_status_secondary_discharging:+",$plane_secondary=$color_status_secondary_discharging"}
 	elif [[ $status =~ (attached) ]]; then
-		printf "#[$plane_primary=$color_status_primary_attached${color_status_secondary_attached:+",$plane_secondary=$color_status_secondary_attached"}]"
+		printf "#[%s=%s%s]" "$plane_primary" "$color_status_primary_attached" \
+		${color_status_secondary_attached:+",$plane_secondary=$color_status_secondary_attached"}
 	else
-		printf "#[$plane_primary=$color_status_primary_unknown${color_status_secondary_unknown:+",$plane_secondary=$color_status_secondary_unknown"}]"
+		printf "#[%s=%s%s]" "$plane_primary" "$color_status_primary_unknown" \
+		${color_status_secondary_unknown:+",$plane_secondary=$color_status_secondary_unknown"}
 	fi
 }
 
@@ -71,4 +78,4 @@ main() {
 	print_color_status "$plane" "$status"
 }
 
-main $@
+main "$@"

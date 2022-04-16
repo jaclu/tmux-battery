@@ -2,6 +2,7 @@
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
 
 short=false
@@ -11,35 +12,39 @@ get_remain_settings() {
 }
 
 battery_discharging() {
-	local status="$(battery_status)"
+	local status
+	status="$(battery_status)"
 	[[ $status =~ (discharging) ]]
 }
 
 battery_charged() {
-	local status="$(battery_status)"
+	local status
+	status="$(battery_status)"
 	[[ $status =~ (charged) || $status =~ (full) ]]
 }
 
 
 convertmins() {
-	((h=${1}/60))
-	((m=${1}%60))
-	printf "%02d:%02d\n" $h $m $s
+	local seconds="$1"
+	((h="$seconds"/60))
+	((m="$seconds"%60))
+	printf "%02d:%02d\n" $h $m
 }
 
 apm_battery_remaining_time() {
-	local remaining_time="$(convertmins $(apm -m))"
+	local remaining_time
+	remaining_time="$(convertmins "$(apm -m)")"
 	if battery_discharging; then
 		if $short; then
-			echo $remaining_time | awk '{printf "~%s", $1}'
+			echo "$remaining_time" | awk '{printf "~%s", $1}'
 		else
-			echo $remaining_time | awk '{printf "- %s left", $1}'
+			echo "$remaining_time" | awk '{printf "- %s left", $1}'
 		fi
 	elif battery_charged; then
 		if $short; then
-			echo $remaining_time | awk '{printf "charged", $1}'
+			echo "$remaining_time" | awk '{printf "charged", $1}'
 		else
-			echo $remaining_time | awk '{printf "fully charged", $1}'
+			echo "$remaining_time" | awk '{printf "fully charged", $1}'
 		fi
 	else
 		echo "charging"
@@ -47,32 +52,34 @@ apm_battery_remaining_time() {
 }
 
 pmset_battery_remaining_time() {
-	local status="$(pmset -g batt)"
-	if echo $status | grep 'no estimate' >/dev/null 2>&1; then
+	local status
+	status="$(pmset -g batt)"
+	if echo "$status" | grep 'no estimate' >/dev/null 2>&1; then
 		if $short; then
 			echo '~?:??'
 		else
 			echo '- Calculating estimate...'
 		fi
 	else
-		local remaining_time="$(echo $status | grep -o '[0-9]\{1,2\}:[0-9]\{1,2\}')"
+		local remaining_time
+		remaining_time="$(echo "$status" | grep -o '[0-9]\{1,2\}:[0-9]\{1,2\}')"
 		if battery_discharging; then
 			if $short; then
-				echo $remaining_time | awk '{printf "~%s", $1}'
+				echo "$remaining_time" | awk '{printf "~%s", $1}'
 			else
-				echo $remaining_time | awk '{printf "- %s left", $1}'
+				echo "$remaining_time" | awk '{printf "- %s left", $1}'
 			fi
 		elif battery_charged; then
 			if $short; then
-				echo $remaining_time | awk '{printf "charged", $1}'
+				echo "$remaining_time" | awk '{printf "charged", $1}'
 			else
-				echo $remaining_time | awk '{printf "fully charged", $1}'
+				echo "$remaining_time" | awk '{printf "fully charged", $1}'
 			fi
 		else
 			if $short; then
-				echo $remaining_time | awk '{printf "~%s", $1}'
+				echo "$remaining_time" | awk '{printf "~%s", $1}'
 			else
-				echo $remaining_time | awk '{printf "- %s till full", $1}'
+				echo "$remaining_time" | awk '{printf "- %s till full", $1}'
 			fi
 		fi
 	fi
@@ -106,12 +113,41 @@ upower_battery_remaining_time() {
 }
 
 acpi_battery_remaining_time() {
-	acpi -b | grep -m 1 -Eo "[0-9]+:[0-9]+:[0-9]+"
+	local remaining_time
+	#  Only use hours:minutes
+	remaining_time="$(acpi -b | grep -m 1 -Eo "[0-9]+:[0-9]+")"
+	if [ -z "$remaining_time" ]; then
+		if $short; then
+			echo '~?:??'
+		else
+			echo '- Calculating estimate...'
+		fi
+		return
+	fi
+	if battery_discharging; then
+		if $short; then
+			echo "$remaining_time" | awk '{printf "~%s", $1}'
+		else
+			echo "$remaining_time" | awk '{printf "- %s left", $1}'
+		fi
+	elif battery_charged; then
+		if $short; then
+			echo ""
+		else
+			echo "charged"
+		fi
+	else
+		if $short; then
+			echo "$remaining_time" | awk '{printf "~%s", $1}'
+		else
+			echo "$remaining_time" | awk '{printf "- %s till full", $1}'
+		fi
+	fi
 }
 
 print_battery_remain() {
 	if is_wsl; then
-		echo "?"	# currently unsupported on WSL
+		echo "?"    # currently unsupported on WSL
 	elif command_exists "pmset"; then
 		pmset_battery_remaining_time
 	elif command_exists "acpi"; then
