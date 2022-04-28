@@ -3,7 +3,7 @@
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # shellcheck disable=SC1091
-source "$CURRENT_DIR/utils.sh"
+source "$CURRENT_DIR/helpers.sh"
 
 color_full_charge_default="#[bg=green]"
 color_high_charge_default="#[bg=yellow]"

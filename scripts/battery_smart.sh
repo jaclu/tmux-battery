@@ -13,7 +13,7 @@
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # shellcheck disable=SC1091
-source "$CURRENT_DIR/utils.sh"
+source "$CURRENT_DIR/helpers.sh"
 source "$CURRENT_DIR/battery_icon_status.sh"  > /dev/null
 source "$CURRENT_DIR/battery_percentage.sh"  > /dev/null
 source "$CURRENT_DIR/battery_color_charge.sh" > /dev/null
