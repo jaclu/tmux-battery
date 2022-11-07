@@ -40,7 +40,7 @@ battery_commands=(
 set_tmux_option() {
 	local option="$1"
 	local value="$2"
-	tmux set-option -gq "$option" "$value"
+	$TMUX_BIN set-option -gq "$option" "$value"
 }
 
 do_interpolation() {

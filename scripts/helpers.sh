@@ -19,6 +19,17 @@ plugin_name="tmux-battery"
 
 
 #
+#  I use an env var TMUX_BIN to point at the used tmux, defined in my
+#  tmux.conf, in order to pick the version matching the server running,
+#  or when the tmux bin is in fact tmate :)
+#  If not found, it is set to whatever is in PATH, so should have no negative
+#  impact. In all calls to tmux I use $TMUX_BIN instead in the rest of this
+#  plugin.
+#
+[ -z "$TMUX_BIN" ] && TMUX_BIN="tmux"
+
+
+#
 #  If $log_file is empty or undefined, no logging will occur.
 #
 log_it() {
@@ -31,7 +42,7 @@ log_it() {
 get_tmux_option() {
 	gtm_option=$1
 	gtm_default=$2
-	gtm_value=$(tmux show-option -gqv "$gtm_option")
+	gtm_value=$($TMUX_BIN show-option -gqv "$gtm_option")
 	if [ -z "$gtm_value" ]; then
 		echo "$gtm_default"
 	else
