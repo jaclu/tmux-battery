@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
@@ -23,11 +23,10 @@ battery_charged() {
 	[[ $status =~ (charged) || $status =~ (full) ]]
 }
 
-
 convertmins() {
 	local seconds="$1"
-	((h="$seconds"/60))
-	((m="$seconds"%60))
+	((h = "$seconds" / 60))
+	((m = "$seconds" % 60))
 	printf "%02d:%02d\n" $h $m
 }
 
@@ -86,7 +85,7 @@ pmset_battery_remaining_time() {
 }
 
 upower_battery_remaining_time() {
-	battery=$(upower -e | grep -E 'battery|DisplayDevice'| tail -n1)
+	battery=$(upower -e | grep -E 'battery|DisplayDevice' | tail -n1)
 	if battery_discharging; then
 		local remaining_time
 		remaining_time=$(upower -i "$battery" | grep -E '(remain|time to empty)')
@@ -116,7 +115,7 @@ acpi_battery_remaining_time() {
 	local remaining_time
 	#  Only use hours:minutes
 	remaining_time="$(acpi -b | grep -m 1 -Eo "[0-9]+:[0-9]+")"
-	if [ -z "$remaining_time" ]; then
+	if [[ -z "$remaining_time" ]]; then
 		if $short; then
 			echo '~?:??'
 		else
@@ -147,7 +146,7 @@ acpi_battery_remaining_time() {
 
 print_battery_remain() {
 	if is_wsl; then
-		echo "?"    # currently unsupported on WSL
+		echo "?" # currently unsupported on WSL
 	elif command_exists "pmset"; then
 		pmset_battery_remaining_time
 	elif command_exists "acpi"; then

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
@@ -18,13 +18,13 @@ print_battery_percentage() {
 	elif command_exists "upower"; then
 		# use DisplayDevice if available otherwise battery
 		local battery
-		battery=$(upower -e | grep -E 'battery|DisplayDevice'| tail -n1)
-		if [ -z "$battery" ]; then
+		battery=$(upower -e | grep -E 'battery|DisplayDevice' | tail -n1)
+		if [[ -z "$battery" ]]; then
 			return
 		fi
 		local percentage
 		percentage="$(upower -i "$battery" | awk '/percentage:/ {print $2}')"
-		if [ "$percentage" ]; then
+		if [[ -n "$percentage" ]]; then
 			echo "${percentage%.*%}"
 			return
 		fi
@@ -32,7 +32,7 @@ print_battery_percentage() {
 		local energy_full
 		energy="$(upower -i "$battery" | awk -v nrg="$energy" '/energy:/ {print nrg+$2}')"
 		energy_full=$(upower -i "$battery" | awk -v nrgfull="$energy_full" '/energy-full:/ {print nrgfull+$2}')
-		if [ -n "$energy" ] && [ -n "$energy_full" ]; then
+		if [[ -n "$energy" ]] && [[ -n "$energy_full" ]]; then
 			echo "$energy $energy_full" | awk '{printf("%d%%", ($1/$2)*100)}'
 		fi
 	elif command_exists "termux-battery-status"; then

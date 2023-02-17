@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
@@ -20,11 +20,9 @@ icon_status_discharging_default='🔋'
 icon_status_attached_default='⚠️'
 icon_status_unknown_default='?'
 
-
 is_osx() {
-	[ "$(uname)" == "Darwin" ]
+	[[ "$(uname)" == "Darwin" ]]
 }
-
 
 # determine which charged_default variable to use
 get_icon_status_charged_default() {
@@ -66,4 +64,3 @@ main() {
 }
 
 main "$@"
-

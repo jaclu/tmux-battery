@@ -10,16 +10,15 @@
 #   Version: 1.1.0 2022-04-13
 #
 
-CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
-source "$CURRENT_DIR/battery_icon_status.sh"  > /dev/null
-source "$CURRENT_DIR/battery_percentage.sh"  > /dev/null
-source "$CURRENT_DIR/battery_color_charge.sh" > /dev/null
-source "$CURRENT_DIR/battery_remain.sh" > /dev/null
+source "$CURRENT_DIR/battery_icon_status.sh" >/dev/null
+source "$CURRENT_DIR/battery_percentage.sh" >/dev/null
+source "$CURRENT_DIR/battery_color_charge.sh" >/dev/null
+source "$CURRENT_DIR/battery_remain.sh" >/dev/null
 #short=false
-
 
 main() {
 	#get_icon_status_settings
@@ -33,7 +32,7 @@ main() {
 	percentage="$("$CURRENT_DIR"/battery_percentage.sh | sed -e 's/%//')"
 	icon_status=$(print_icon_status "$status")
 
-	if [ "$status" != "discharging" ] && [ "$percentage" -ge 98 ]; then
+	if [[ "$status" != "discharging" ]] && [[ "$percentage" -ge 98 ]]; then
 		# If almost full or better and plugged in, we do not need to see
 		# details about battery. An icon indicating power is plugged in,
 		# should be enough

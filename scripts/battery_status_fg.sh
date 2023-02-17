@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
@@ -29,16 +29,16 @@ print_battery_status_fg() {
 	# Call `battery_percentage.sh`.
 	percentage="$("$CURRENT_DIR"/battery_percentage.sh | sed -e 's/%//')"
 	status=$(battery_status | awk '{print $1;}')
-	if [ "$status" == 'charging' ]; then
+	if [[ "$status" == 'charging' ]]; then
 		printf "%s" "$color_charging"
-	elif [ "$percentage" -eq 100 ]; then
+	elif [[ "$percentage" -eq 100 ]]; then
 		printf "%s" "$color_full_charge"
-	elif [ "$percentage" -le 99 ] && [ "$percentage" -ge 51 ];then
+	elif [[ "$percentage" -le 99 ]] && [[ "$percentage" -ge 51 ]]; then
 		printf "%s" "$color_high_charge"
-	elif [ "$percentage" -le 50 ] && [ "$percentage" -ge 16 ];then
+	elif [[ "$percentage" -le 50 ]] && [[ "$percentage" -ge 16 ]]; then
 		printf "%s" "$color_medium_charge"
-	elif [ "$percentage" == "" ];then
-		printf "%s" "$color_full_charge_default"  # assume it's a desktop
+	elif [[ "$percentage" == "" ]]; then
+		printf "%s" "$color_full_charge_default" # assume it's a desktop
 	else
 		printf "%s" "$color_low_charge"
 	fi

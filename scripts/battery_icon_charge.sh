@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
@@ -39,20 +39,20 @@ get_icon_charge_settings() {
 
 print_icon_charge() {
 	percentage="$("$CURRENT_DIR"/battery_percentage.sh | sed -e 's/%//')"
-	if [ "$percentage" -ge 95 ] || [ "$percentage" == "" ]; then
+	if [[ "$percentage" -ge 95 ]] || [[ "$percentage" == "" ]]; then
 		# if percentage is empty, assume it's a desktop
 		printf "%s" "$icon_charge_tier8"
-	elif [ "$percentage" -ge 80 ]; then
+	elif [[ "$percentage" -ge 80 ]]; then
 		printf "%s" "$icon_charge_tier7"
-	elif [ "$percentage" -ge 65 ]; then
+	elif [[ "$percentage" -ge 65 ]]; then
 		printf "%s" "$icon_charge_tier6"
-	elif [ "$percentage" -ge 50 ]; then
+	elif [[ "$percentage" -ge 50 ]]; then
 		printf "%s" "$icon_charge_tier5"
-	elif [ "$percentage" -ge 35 ]; then
+	elif [[ "$percentage" -ge 35 ]]; then
 		printf "%s" "$icon_charge_tier4"
-	elif [ "$percentage" -ge 20 ]; then
+	elif [[ "$percentage" -ge 20 ]]; then
 		printf "%s" "$icon_charge_tier3"
-	elif [ "$percentage" -gt 5 ]; then
+	elif [[ "$percentage" -gt 5 ]]; then
 		printf "%s" "$icon_charge_tier2"
 	else
 		printf "%s" "$icon_charge_tier1"

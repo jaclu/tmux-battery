@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
@@ -64,45 +64,45 @@ get_color_charge_settings() {
 print_color_charge() {
 	local primary_plane="$1"
 	local secondary_plane=""
-	if [ "$primary_plane" == "bg" ]; then
+	if [[ "$primary_plane" == "bg" ]]; then
 		secondary_plane="fg"
 	else
 		primary_plane="fg"
 		secondary_plane="bg"
 	fi
 	percentage="$("$CURRENT_DIR/battery_percentage.sh" | sed -e 's/%//')"
-	if [ "$percentage" -ge 95 ] || [ "$percentage" == "" ]; then
+	if [[ "$percentage" -ge 95 ]] || [[ "$percentage" == "" ]]; then
 		# if percentage is empty, assume it's a desktop
 		printf "#[%s=%s%s]" "$primary_plane" "$color_charge_primary_tier8" \
-		${color_charge_secondary_tier8:+",$secondary_plane=$color_charge_secondary_tier8"}
+			${color_charge_secondary_tier8:+",$secondary_plane=$color_charge_secondary_tier8"}
 		# printf "#[$primary_plane=$color_charge_primary_tier8${color_charge_secondary_tier8:+",$secondary_plane=$color_charge_secondary_tier8"}]"
-	elif [ "$percentage" -ge 80 ]; then
+	elif [[ "$percentage" -ge 80 ]]; then
 		printf "#[%s=%s%s]" "$primary_plane" "$color_charge_primary_tier7" \
-		${color_charge_secondary_tier7:+",$secondary_plane=$color_charge_secondary_tier7"}
+			${color_charge_secondary_tier7:+",$secondary_plane=$color_charge_secondary_tier7"}
 		# printf "#[$primary_plane=$color_charge_primary_tier7${color_charge_secondary_tier7:+",$secondary_plane=$color_charge_secondary_tier7"}]"
-	elif [ "$percentage" -ge 65 ]; then
+	elif [[ "$percentage" -ge 65 ]]; then
 		printf "#[%s=%s%s]" "$primary_plane" "$color_charge_primary_tier6" \
-		${color_charge_secondary_tier6:+",$secondary_plane=$color_charge_secondary_tier6"}
+			${color_charge_secondary_tier6:+",$secondary_plane=$color_charge_secondary_tier6"}
 		# printf "#[$primary_plane=$color_charge_primary_tier6${color_charge_secondary_tier6:+",$secondary_plane=$color_charge_secondary_tier6"}]"
-	elif [ "$percentage" -ge 50 ]; then
+	elif [[ "$percentage" -ge 50 ]]; then
 		printf "#[%s=%s%s]" "$primary_plane" "$color_charge_primary_tier5" \
-		${color_charge_secondary_tier5:+",$secondary_plane=$color_charge_secondary_tier5"}
+			${color_charge_secondary_tier5:+",$secondary_plane=$color_charge_secondary_tier5"}
 		# printf "#[$primary_plane=$color_charge_primary_tier5${color_charge_secondary_tier5:+",$secondary_plane=$color_charge_secondary_tier5"}]"
-	elif [ "$percentage" -ge 35 ]; then
+	elif [[ "$percentage" -ge 35 ]]; then
 		printf "#[%s=%s%s]" "$primary_plane" "$color_charge_primary_tier4" \
-		${color_charge_secondary_tier4:+",$secondary_plane=$color_charge_secondary_tier4"}
+			${color_charge_secondary_tier4:+",$secondary_plane=$color_charge_secondary_tier4"}
 		# printf "#[$primary_plane=$color_charge_primary_tier4${color_charge_secondary_tier4:+",$secondary_plane=$color_charge_secondary_tier4"}]"
-	elif [ "$percentage" -ge 20 ]; then
+	elif [[ "$percentage" -ge 20 ]]; then
 		printf "#[%s=%s%s]" "$primary_plane" "$color_charge_primary_tier3" \
-		${color_charge_secondary_tier3:+",$secondary_plane=$color_charge_secondary_tier3"}
+			${color_charge_secondary_tier3:+",$secondary_plane=$color_charge_secondary_tier3"}
 		# printf "#[$primary_plane=$color_charge_primary_tier3${color_charge_secondary_tier3:+",$secondary_plane=$color_charge_secondary_tier3"}]"
-	elif [ "$percentage" -gt 5 ]; then
+	elif [[ "$percentage" -gt 5 ]]; then
 		printf "#[%s=%s%s]" "$primary_plane" "$color_charge_primary_tier2" \
-		${color_charge_secondary_tier2:+",$secondary_plane=$color_charge_secondary_tier2"}
+			${color_charge_secondary_tier2:+",$secondary_plane=$color_charge_secondary_tier2"}
 		# printf "#[$primary_plane=$color_charge_primary_tier2${color_charge_secondary_tier2:+",$secondary_plane=$color_charge_secondary_tier2"}]"
 	else
 		printf "#[%s=%s%s]" "$primary_plane" "$color_charge_primary_tier1" \
-		${color_charge_secondary_tier1:+",$secondary_plane=$color_charge_secondary_tier1"}
+			${color_charge_secondary_tier1:+",$secondary_plane=$color_charge_secondary_tier1"}
 		# printf "#[$primary_plane=$color_charge_primary_tier1${color_charge_secondary_tier1:+",$secondary_plane=$color_charge_secondary_tier1"}]"
 	fi
 }

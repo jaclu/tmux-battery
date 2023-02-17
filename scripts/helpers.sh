@@ -10,13 +10,11 @@
 #
 plugin_name="tmux-battery"
 
-
 #
 #  If log_file is empty or undefined, no logging will occur,
 #  so comment it out for normal usage.
 #
 #log_file="/tmp/$plugin_name.log"
-
 
 #
 #  I use an env var TMUX_BIN to point at the used tmux, defined in my
@@ -26,24 +24,23 @@ plugin_name="tmux-battery"
 #  impact. In all calls to tmux I use $TMUX_BIN instead in the rest of this
 #  plugin.
 #
-[ -z "$TMUX_BIN" ] && TMUX_BIN="tmux"
-
+[[ -z "$TMUX_BIN" ]] && TMUX_BIN="tmux"
 
 #
 #  If $log_file is empty or undefined, no logging will occur.
 #
 log_it() {
-	if [ -z "$log_file" ]; then
+	if [[ -z "$log_file" ]]; then
 		return
 	fi
-	printf "[%s] %s\n" "$(date '+%H:%M:%S')" "$@" >> "$log_file"
+	printf "[%s] %s\n" "$(date '+%H:%M:%S')" "$@" >>"$log_file"
 }
 
 get_tmux_option() {
 	gtm_option=$1
 	gtm_default=$2
 	gtm_value=$($TMUX_BIN show-option -gqv "$gtm_option")
-	if [ -z "$gtm_value" ]; then
+	if [[ -z "$gtm_value" ]]; then
 		echo "$gtm_default"
 	else
 		echo "$gtm_value"
@@ -54,7 +51,7 @@ get_tmux_option() {
 }
 
 is_wsl() {
-	version=$(2> /dev/null cat /proc/version)
+	version=$(cat 2>/dev/null /proc/version)
 	if [[ "$version" == *"Microsoft"* || "$version" == *"microsoft"* ]]; then
 		return 0
 	else
@@ -78,16 +75,16 @@ battery_status() {
 		acpi -b | awk '{gsub(/,/, ""); print tolower($3); exit}'
 	elif command_exists "upower"; then
 		local battery
-		battery=$(upower -e | grep -E 'battery|DisplayDevice'| tail -n1)
+		battery=$(upower -e | grep -E 'battery|DisplayDevice' | tail -n1)
 		upower -i "$battery" | awk '/state/ {print $2}'
 	elif command_exists "termux-battery-status"; then
 		termux-battery-status | jq -r '.status' | awk '{printf("%s%", tolower($1))}'
 	elif command_exists "apm"; then
 		local battery
 		battery=$(apm -a)
-		if [ "$battery" -eq 0 ]; then
+		if [[ "$battery" -eq 0 ]]; then
 			echo "discharging"
-		elif [ "$battery" -eq 1 ]; then
+		elif [[ "$battery" -eq 1 ]]; then
 			echo "charging"
 		fi
 	fi
