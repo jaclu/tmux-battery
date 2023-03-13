@@ -4,7 +4,7 @@ I added display item "#{battery_smart}".
 
 power state | display
 -|-
-Power >= 98% & Plugged in | icon_status_charged
+Power >= 99% & Plugged in | icon_status_charged
 Otherwise | Icon_status, percentage and remain with color_charge bg
 
  Tmux battery status
