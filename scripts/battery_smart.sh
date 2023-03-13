@@ -32,7 +32,7 @@ main() {
 	percentage="$("$CURRENT_DIR"/battery_percentage.sh | sed -e 's/%//')"
 	icon_status=$(print_icon_status "$status")
 
-	if [[ "$status" != "discharging" ]] && [[ "$percentage" -ge 98 ]]; then
+	if [[ "$status" != "discharging" ]] && [[ "$percentage" -ge 99 ]]; then
 		# If almost full or better and plugged in, we do not need to see
 		# details about battery. An icon indicating power is plugged in,
 		# should be enough
