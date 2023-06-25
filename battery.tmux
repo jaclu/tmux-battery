@@ -61,7 +61,7 @@ update_tmux_option() {
 }
 
 main() {
-    if [ -d /proc/ish ]; then
+    if [[ -d /proc/ish ]]; then
         tmux display "Plugin tmux-battery can not run on iSH!"
     else
 	update_tmux_option "status-right"
