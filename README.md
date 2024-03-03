@@ -1,4 +1,4 @@
-# My changes
+#MyChanges
 
 I added display item "#{battery_smart}".
 
@@ -37,7 +37,7 @@ If format strings are added to `status-right`, they should now be visible.
 
 ### Manual Installation
 
-Clone the repo:
+Clone the repository:
 
 ```shell
 git clone https://github.com/tmux-plugins/tmux-battery ~/clone/path
