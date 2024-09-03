@@ -2,15 +2,55 @@
 #  shellcheck disable=SC1091
 #  Directives for shellcheck directly after bang path are global
 #
-#   Copyright (c) 2021,2022: Jacob.Lundqvist@gmail.com
+#   Copyright (c) 2021,2022,2024: Jacob.Lundqvist@gmail.com
 #   License: MIT
 #
 #   Part of https://github.com/jaclu/tmux-battery
 #
-#   Version: 1.1.0 2022-04-13
+#   Version: 1.2.0 2024-09-04
 #
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CURRENT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+PLUGIN_DIR="$(dirname "$CURRENT_DIR")"
+
+#
+# To ensure rapid updates from other plugins, battery_smart is often called
+# every 5-10 seconds. However, recalculating the battery status every time
+# is costly, taking approximately 0.3s to complete on some systems.
+# Since battery charge levels don’t change rapidly, it’s sufficient to
+# process this information every 30 seconds. This caching mechanism
+# significantly reduces the performance overhead by reusing results
+# within a 30-second window.
+#
+
+f_cached_result="$PLUGIN_DIR"/smart_status.cache
+cache_max_age=30
+
+if [[ -f "$f_cached_result" ]]; then
+	current_time=$(date +%s)
+
+	file_mod_time=$( # date -r should normally work and is faster than stat
+		date -r "$f_cached_result" +%s 2>/dev/null
+	) || file_mod_time=$( # GNU/Linux fallback
+		stat -c %Y "$f_cached_result" 2>/dev/null
+	) || file_mod_time=$( # BSD fallback
+		stat -f %m "$f_cached_result" 2>/dev/null
+	)
+
+	# If all methods fail, invalidate the cache by setting a zero timestamp
+	file_mod_time=${file_mod_time:-0}
+
+	time_diff=$((current_time - file_mod_time))
+
+	if ((time_diff < cache_max_age)); then
+		cat "$f_cached_result"
+		exit 0
+	else
+		rm -f "$f_cached_result"
+	fi
+fi
+
+# If the cache did not handle the request, proceed with recalculating...
 
 # shellcheck disable=SC1091
 source "$CURRENT_DIR/helpers.sh"
@@ -36,13 +76,14 @@ main() {
 		# If almost full or better and plugged in, we do not need to see
 		# details about battery. An icon indicating power is plugged in,
 		# should be enough
-		printf "%s" "$icon_status"
+		printf "%s" "$icon_status" >"$f_cached_result"
 	else
 		#  Variables only retrieved when needed, in order to cut down overhead
 		color_bg="$(print_color_charge bg)"
 		remain=$(print_battery_remain)
-		printf "%s" "${color_bg}$icon_status ${percentage} ${remain}#[default]"
+		printf "%s" "${color_bg}$icon_status ${percentage} ${remain}#[default]" >"$f_cached_result"
 	fi
+	cat "$f_cached_result"
 }
 
 main
