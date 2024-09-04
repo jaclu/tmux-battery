@@ -10,19 +10,15 @@
 #   Version: 1.2.0 2024-09-04
 #
 
-CURRENT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(dirname "$CURRENT_DIR")"
 
-#
-# To ensure rapid updates from other plugins, battery_smart is often called
-# every 5-10 seconds. However, recalculating the battery status every time
-# is costly, taking approximately 0.3s to complete on some systems.
-# Since battery charge levels don’t change rapidly, it’s sufficient to
-# process this information every 30 seconds. This caching mechanism
-# significantly reduces the performance overhead by reusing results
-# within a 30-second window.
-#
-
+# This script may be triggered frequently, potentially every 5 seconds or less,.
+# On slower systems, this frequent execution can lead to noticeable delays
+# due to the script’s substantial processing requirements.
+# To improve responsiveness and reduce system load, a cached result is used
+# to limit full processing to once every 30 seconds.
+# This approach roughly reduces the runtime by a factor of twenty.
 f_cached_result="$PLUGIN_DIR"/smart_status.cache
 cache_max_age=30
 
