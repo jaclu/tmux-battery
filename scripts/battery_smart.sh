@@ -13,38 +13,35 @@
 CURRENT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 PLUGIN_DIR="$(dirname "$CURRENT_DIR")"
 
-# This script may be triggered frequently, potentially every 5 seconds or less,.
+# This script may be triggered frequently, potentially every 5 seconds or less.
 # On slower systems, this frequent execution can lead to noticeable delays
 # due to the script’s substantial processing requirements.
 # To improve responsiveness and reduce system load, a cached result is used
 # to limit full processing to once every 30 seconds.
-# This approach roughly reduces the runtime by a factor of twenty.
+# This approach roughly reduces the runtime by a factor of twenty on cache hit.
 
 f_cached_result="$PLUGIN_DIR"/smart_status.cache
 cache_max_age=30
 
 if [[ -f "$f_cached_result" ]]; then
-	current_time=$(date +%s)
+    current_time=$(date +%s)
 
-	file_mod_time=$( # date -r should normally work and is faster than stat
-		date -r "$f_cached_result" +%s 2>/dev/null
-	) || file_mod_time=$( # GNU/Linux fallback
-		stat -c %Y "$f_cached_result" 2>/dev/null
-	) || file_mod_time=$( # BSD fallback
-		stat -f %m "$f_cached_result" 2>/dev/null
-	)
+    # if one assignment fails, try the next one...
+    file_mod_time=$( # date -r should normally work and is faster than stat
+        date -r "$f_cached_result" +%s 2>/dev/null
+    ) || file_mod_time=$( # GNU/Linux fallback
+        stat -c %Y "$f_cached_result" 2>/dev/null
+    ) || file_mod_time=$( # BSD & Darwin fallback
+        stat -f %m "$f_cached_result" 2>/dev/null
+    ) || file_mod_time=0  # invalidate cache by setting a zero timestamp
 
-	# If all methods fail, invalidate the cache by setting a zero timestamp
-	file_mod_time=${file_mod_time:-0}
-
-	time_diff=$((current_time - file_mod_time))
-
-	if ((time_diff < cache_max_age)); then
-		cat "$f_cached_result"
-		exit 0
-	else
-		rm -f "$f_cached_result"
-	fi
+    time_diff=$((current_time - file_mod_time))
+    if ((time_diff < cache_max_age)); then
+	cat "$f_cached_result"
+	exit 0
+    else
+	rm -f "$f_cached_result"
+    fi
 fi
 
 # If the cache did not handle the request, proceed with recalculating...
