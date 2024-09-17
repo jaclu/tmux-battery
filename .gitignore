@@ -1,3 +1,6 @@
+# linting tool
+.cache.olint
+.olint.conf
 
 # cache file
 smart_status.cache
