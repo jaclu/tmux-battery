@@ -10,7 +10,7 @@
 #   Version: 1.2.0 2024-09-04
 #
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CURRENT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 PLUGIN_DIR="$(dirname "$CURRENT_DIR")"
 
 # This script may be triggered frequently, potentially every 5 seconds or less,.
@@ -19,6 +19,7 @@ PLUGIN_DIR="$(dirname "$CURRENT_DIR")"
 # To improve responsiveness and reduce system load, a cached result is used
 # to limit full processing to once every 30 seconds.
 # This approach roughly reduces the runtime by a factor of twenty.
+
 f_cached_result="$PLUGIN_DIR"/smart_status.cache
 cache_max_age=30
 
