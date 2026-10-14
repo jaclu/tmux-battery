@@ -1,5 +1,14 @@
 # Tmux battery status
 
+## jaclu fork changes
+
+New item usable in status bar: `#{battery_smart}` If batterry is plugged-in and
+fully charged, show nothing. Otherwise give battery status.
+This also supports AlDente and indicates both if current charge is over
+the aldente_charge_limit, and shows nothing is Aldente is not charging.
+
+## normal readme resumes
+
 Enables displaying battery percentage and status icon in tmux status-right.
 
 ## Installation

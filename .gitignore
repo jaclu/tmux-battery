@@ -1,1 +1,7 @@
 *.swp
+
+# olint meta-linter
+.cache.olint
+
+# cache file for scripts/battery_smart.sh
+smart_status.cache

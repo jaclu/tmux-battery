@@ -18,6 +18,7 @@ battery_interpolation=(
 	"\#{battery_percentage}"
 	"\#{battery_remain}"
 	"\#{battery_charging_watts}"
+	"\#{battery_smart}"
 )
 
 battery_commands=(
@@ -34,12 +35,13 @@ battery_commands=(
 	"#($CURRENT_DIR/scripts/battery_percentage.sh)"
 	"#($CURRENT_DIR/scripts/battery_remain.sh)"
 	"#($CURRENT_DIR/scripts/battery_charging_watts.sh)"
+	"#($CURRENT_DIR/scripts/battery_smart.sh)"
 )
 
 set_tmux_option() {
 	local option="$1"
 	local value="$2"
-	tmux set-option -gq "$option" "$value"
+	$TMUX_BIN set-option -gq "$option" "$value"
 }
 
 do_interpolation() {

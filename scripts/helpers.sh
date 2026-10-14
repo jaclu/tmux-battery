@@ -1,7 +1,17 @@
+#
+# I use an env var TMUX_BIN to point at the used tmux, since I often switch between
+# asdf built tmuxes to test compatibility, personally I define this in my
+# tmux.conf, in order to pick the version matching the server running.
+#  If not found, it is set to whatever is in PATH, so should have no negative
+#  impact for others. In all calls to tmux I use $TMUX_BIN instead in the rest of this
+#  plugin.
+#
+[[ -z "$TMUX_BIN" ]] && TMUX_BIN="tmux"
+
 get_tmux_option() {
 	local option="$1"
 	local default_value="$2"
-	local option_value="$(tmux show-option -gqv "$option")"
+	local option_value="$($TMUX_BIN show-option -gqv "$option")"
 	if [ -z "$option_value" ]; then
 		echo "$default_value"
 	else
@@ -23,6 +33,7 @@ is_chrome() {
 }
 
 is_wsl() {
+	[[ -f /proc/version ]] || return 1 # System without /proc
 	version=$(</proc/version)
 	if [[ "$version" == *"Linux"* || "$version" == *"Microsoft"* || "$version" == *"microsoft"* ]]; then
 		return 0
