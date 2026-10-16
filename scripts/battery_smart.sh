@@ -60,7 +60,7 @@ cache_check() {
 }
 
 clear_battery_status() {
-    log_it "><> clear_battery_status()"
+    # log_it "clear_battery_status()"
     echo "" >"$f_cached_result"
 }
 
@@ -80,7 +80,7 @@ check_status() {
         aldente_ok_level="${aldente_sailing_floor:-aldente_charge_limit}"
         if [[ $percentage -gt $aldente_charge_limit ]]; then
             case $status in
-                charging*) icon_status+='🔺' ;;
+                charging* | charged) icon_status+='🔺' ;;
                 *attached*) icon_status='🔌🔻' ;;
                 *) icon_status+='🔻' ;;
             esac
@@ -90,14 +90,11 @@ check_status() {
         fi
     }
 
-    log_it "><> status[$status] percentage[$percentage] icon_status[$icon_status]"
-
+    # log_it "status[$status] percentage[$percentage] icon_status[$icon_status]"
     if [[ $status != discharging && $percentage -ge 98 ]]; then
-        # If almost full or better and plugged in, we do not need to see
-        # details about battery state.
+        # If almost full and plugged in: no need to see details about battery state.
         clear_battery_status
     else
-        log_it "><> will display smart status"
         color_bg=$(print_color_charge bg)
         remain=$(print_battery_remain)
         printf "%s" "${color_bg}$icon_status ${percentage} ${remain}#[default] " \
@@ -125,7 +122,7 @@ f_cached_result="$PLUGIN_DIR"/smart_status.cache
 cache_max_age=30 # seconds
 
 aldente_charge_limit=80
-aldente_sailing_floor=75 # optional - if Aldente Sailing Mode is used...
+aldente_sailing_floor=75 # optional - if Aldente Sailing Mode is used
 
 cache_check
 
