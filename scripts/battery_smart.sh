@@ -2,12 +2,10 @@
 #  shellcheck disable=SC1091
 #  Directives for shellcheck directly after bang path are global
 #
-#   Copyright (c) 2021,2022,2024: Jacob.Lundqvist@gmail.com
+#   Copyright (c) 2021,2022,2024,2026: Jacob.Lundqvist@gmail.com
 #   License: MIT
 #
 #   Part of https://github.com/jaclu/tmux-battery
-#
-#   Version: 1.2.0 2024-09-04
 #
 
 #
@@ -20,15 +18,36 @@
 #  If $log_file is empty or undefined, no logging will occur.
 #
 log_it() {
-    if [[ -z "$log_file" ]]; then
-        return
-    fi
-    printf "[%s] %s\n" "$(date '+%H:%M:%S')" "$@" >>"$log_file"
+    [[ -n "$log_file" ]] || return
+    printf "[%s][%s] %s\n" "$(date '+%H:%M:%S')" "$$" "$@" >>"$log_file"
 }
 
 is_aldente() {
     # ensures the charge limit is defined and AlDente is running
     [[ -n $aldente_charge_limit ]] && pgrep AlDente >/dev/null
+}
+
+detect_charge_limit() {
+    #
+    # Currently can only detect charge limit on MacOS
+    #
+    # Provides:
+    #   chargge_limit - if it could be detected and func returns true
+    #
+    local status
+
+    [[ "$(uname -s)" == "Darwin" ]] || return 1
+    status=$(pmset -g battlimit 2>/dev/null) || return 1
+    case $status in
+        *"No battery level limits set"*) return 1 ;; # "no limit"
+        *) ;;
+    esac
+    charge_limit=$(
+        printf '%s\n' "$status" \
+            | sed -n 's/.*chargeSocLimitSoc[[:space:]]*=[[:space:]]*\([0-9][0-9]*\).*/\1/p' \
+            | sort -n | head -n 1
+    )
+    return 0
 }
 
 cache_check() {
@@ -51,6 +70,7 @@ cache_check() {
     current_time=$(date +%s)
     time_diff=$((current_time - file_mod_time))
     if ((time_diff < cache_max_age)); then
+        # log_it "Using cached result"
         cat "$f_cached_result"
         exit 0
     else
@@ -60,15 +80,15 @@ cache_check() {
 }
 
 clear_battery_status() {
-    # log_it "clear_battery_status()"
+    log_it "clear_battery_status()"
     echo "" >"$f_cached_result"
 }
 
 check_status() {
     local status
-    local percentage
-    local aldente_ok_level
     local icon_status
+    local percentage
+    local charge_limit charge_ok_level
     local color_bg
     local remain
 
@@ -76,21 +96,34 @@ check_status() {
     icon_status=$(print_icon_status "$status")
     percentage="$("$CURRENT_DIR"/battery_percentage.sh | sed -e 's/%//')"
 
-    is_aldente && {
-        aldente_ok_level="${aldente_sailing_floor:-aldente_charge_limit}"
-        if [[ $percentage -gt $aldente_charge_limit ]]; then
+    if is_aldente; then
+        charge_limit="$aldente_charge_limit"
+        if [[ -n $aldente_sailing_floor ]]; then
+            charge_ok_level="$aldente_sailing_floor"
+            log_it "Using AlDente charge limits: $charge_ok_level - $charge_limit"
+        else
+            charge_ok_level="$charge_limit"
+            log_it "Using AlDente charge limit: $charge_limit"
+        fi
+    elif detect_charge_limit; then
+        # basic charge_limit does not offer a span of valid levels
+        charge_ok_level="$charge_limit"
+        log_it "Using MacOS charge limit: $charge_limit"
+    fi
+    [[ -n $charge_limit ]] && {
+        if [[ $percentage -gt $charge_limit ]]; then
             case $status in
                 charging* | charged) icon_status+='🔺' ;;
                 *attached*) icon_status='🔌🔻' ;;
                 *) icon_status+='🔻' ;;
             esac
-        elif [[ $percentage -ge $aldente_ok_level && $status != discharging ]]; then
+        elif [[ $percentage -ge $charge_ok_level && $status != discharging ]]; then
             clear_battery_status
             return
         fi
     }
 
-    # log_it "status[$status] percentage[$percentage] icon_status[$icon_status]"
+    log_it "status[$status] percentage[$percentage] icon_status[$icon_status]"
     if [[ $status != discharging && $percentage -ge 98 ]]; then
         # If almost full and plugged in: no need to see details about battery state.
         clear_battery_status
@@ -121,6 +154,7 @@ PLUGIN_DIR=$(dirname "$CURRENT_DIR")
 f_cached_result="$PLUGIN_DIR"/smart_status.cache
 cache_max_age=30 # seconds
 
+# If AlDente is used, its limits needs to be set manually
 aldente_charge_limit=80
 aldente_sailing_floor=75 # optional - if Aldente Sailing Mode is used
 
