@@ -1,5 +1,8 @@
 *.swp
 
+# editor tmp files
+*/.#*
+
 # olint meta-linter
 .cache.olint
 
