@@ -141,9 +141,6 @@ check_status() {
 #
 #===============================================================
 
-CURRENT_DIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
-PLUGIN_DIR=$(dirname "$CURRENT_DIR")
-
 # This script may be triggered frequently, potentially every 5 seconds or less.
 # On slower systems, this frequent execution can lead to noticeable delays
 # due to the script’s substantial processing requirements.
@@ -151,7 +148,10 @@ PLUGIN_DIR=$(dirname "$CURRENT_DIR")
 # to limit full processing to once every 30 seconds.
 # This approach roughly reduces the runtime by a factor of twenty on a cache hit.
 
-f_cached_result="$PLUGIN_DIR"/smart_status.cache
+CURRENT_DIR=$(cd "${0%/*}/" && pwd)
+PLUGIN_DIR=$(dirname "$CURRENT_DIR")
+
+f_cached_result="$PLUGIN_DIR"/.cache.smart_status
 cache_max_age=30 # seconds
 
 # If AlDente is used, its limits needs to be set manually

@@ -8,4 +8,4 @@
 .cache.olint
 
 # cache file for scripts/battery_smart.sh
-smart_status.cache
+.cache.smart_status
