@@ -44,7 +44,8 @@ detect_charge_limit() {
     esac
     charge_limit=$(
         printf '%s\n' "$status" \
-            | sed -n 's/.*chargeSocLimitSoc[[:space:]]*=[[:space:]]*\([0-9][0-9]*\).*/\1/p' \
+            | sed -n \
+                's/.*chargeSocLimitSoc[[:space:]]*=[[:space:]]*\([0-9][0-9]*\).*/\1/p' \
             | sort -n | head -n 1
     )
     return 0
